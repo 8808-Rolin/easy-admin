@@ -1,0 +1,30 @@
+.box_shadow {
+  border-radius: 0.5rem;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+}
+
+.el-table__body-wrapper::-webkit-scrollbar {
+  width: 0.5rem;
+  height: 100%;
+}
+
+.el-table__body-wrapper::-webkit-scrollbar-thumb {
+  background: #1DA0FB;
+  -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  border-radius: 0.25rem;
+}
+
+.scroll_height {
+  overflow: auto;
+}
+
+.scroll_height::-webkit-scrollbar {
+  width: 0.5rem;
+  height: 100%;
+}
+
+.scroll_height::-webkit-scrollbar-thumb {
+  background: #056490;
+  -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  border-radius: 0.25rem;
+}
