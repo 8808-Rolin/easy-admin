@@ -41,6 +41,12 @@ export const constantRoutes = [{
     component: () => import('@/views/404'),
     hidden: true
   },
+  
+  {
+    path: '/500',
+    component: () => import('@/views/500'),
+    hidden: true
+  },
 
   {
     path: '/',
@@ -187,7 +193,7 @@ export const constantRoutes = [{
     path: 'external-link',
     component: Layout,
     children: [{
-      path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
+      path: '',
       meta: {
         title: '返回论坛',
         icon: 'link'

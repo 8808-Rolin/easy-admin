@@ -1,24 +1,30 @@
 import request from '@/utils/request'
+import qs from 'qs'; // 根据需求是否导入qs模块
+import base from './base.js'
+
 
 export function login(data) {
   return request({
-    url: '/vue-admin-template/user/login',
+    url: `${base.sq}/api/user/login`,
     method: 'post',
-    data
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    data:qs.stringify(data)
   })
 }
 
-export function getInfo(token) {
+export function getInfo(uid) {
   return request({
-    url: '/vue-admin-template/user/info',
-    method: 'get',
-    params: { token }
+    url: `${base.sq}/api/info/get-common-person-information`,
+    method: 'post',
+    data:qs.stringify({uid})
   })
 }
 
 export function logout() {
   return request({
-    url: '/vue-admin-template/user/logout',
+    url: `${base.local}/vue-admin-template/user/logout`,
     method: 'post'
   })
 }
