@@ -5,6 +5,7 @@ import {
 import {
   getToken,
   setToken,
+  getAid,
   removeToken
 } from '@/utils/auth'
 import {
@@ -17,7 +18,8 @@ const getDefaultState = () => {
     uid: 0,
     name: '',
     avatar: '',
-    aid:0,
+    aid:getAid(),
+    studentID:'',
   }
 }
 
@@ -41,6 +43,9 @@ const mutations = {
   },
   SET_AID: (state, aid) => {
     state.aid = aid
+  },
+  SET_STUDENTID: (state, studentID) => {
+    state.studentID = studentID
   }
 }
 

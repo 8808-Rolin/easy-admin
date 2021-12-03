@@ -54,8 +54,9 @@ router.beforeEach(async(to, from, next) => {
       // other pages that do not have permission to access are redirected to the login page.
 	  console.log(to.query.aid)
 	  if (to.query.aid !== null || to.query.aid !== undefined) {
-		setAid(to.query.aid)
-		await store.commit('user/SET_AID', to.query.aid)
+      setAid(to.query.aid)
+      await store.commit('user/SET_AID', to.query.aid)
+      await store.commit('user/SET_STUDENTID', to.query.studentID)
 	  }
       next(`/login?redirect=${to.path}`)
       NProgress.done()

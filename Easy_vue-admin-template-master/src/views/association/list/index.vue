@@ -1,6 +1,6 @@
 <template>
   <div style="padding:30px;">
-    <el-alert :closable="false" title="活动一览" />
+    <el-alert :closable="false" title="论坛管理" />
 
     <div class="btn_box">
       <el-button type="primary" size="medium" @click="centerDialogVisible2 = true">发表帖子</el-button>
@@ -104,7 +104,7 @@
 </template>
 
 <script>
-  import TEditor from './tinymce.vue'
+  import TEditor from '../tinymce.vue'
 
   export default {
     data() {

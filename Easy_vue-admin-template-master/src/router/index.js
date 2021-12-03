@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import base from '@/api/base.js'
 
 Vue.use(Router)
 
@@ -111,12 +112,29 @@ export const constantRoutes = [{
       },
       {
         path: 'menu2',
-        component: () => import('@/views/nested/menu2/index'),
+        component: () => import('@/views/nested/menu2'),
         name: 'Menu2',
         meta: {
           title: '入社审批'
-        }
-      }
+        },
+        children: [{
+            path: 'menu1-1',
+            component: () => import('@/views/nested/menu2/menu1-1/index'),
+            name: 'Menu1-1',
+            meta: {
+              title: '待审批'
+            }
+          },
+          {
+            path: 'menu1-3',
+            component: () => import('@/views/nested/menu2/menu1-3/index'),
+            name: 'Menu1-3',
+            meta: {
+              title: '审批历史'
+            }
+          }
+        ]
+      },
     ]
   },
 
@@ -151,19 +169,26 @@ export const constantRoutes = [{
   {
     path: '/association',
     component: Layout,
-    redirect: '/association',
+    redirect: '/association/list',
     name: 'Association',
     meta: {
       title: '论坛管理',
       icon: 'nested'
     },
     children: [{
-        path: '',
-        component: () => import('@/views/association/index'), // Parent router-view
+        path: 'list',
+        component: () => import('@/views/association/list/index'), // Parent router-view
         meta: {
           title: '论坛管理'
         }
-      }]
+      },
+      {
+          path: 'setMes',
+          component: () => import('@/views/association/setMes/index'), // Parent router-view
+          meta: {
+            title: '论坛信息修改'
+          }
+        }]
   },
 
   {
@@ -198,7 +223,7 @@ export const constantRoutes = [{
     path: 'external-link',
     component: Layout,
     children: [{
-      path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
+      path: `${base.local}`,
       meta: {
         title: '返回论坛',
         icon: 'link'

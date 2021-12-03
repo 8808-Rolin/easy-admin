@@ -5,35 +5,36 @@
       <div class="intro box_shadow">
         <div class="left">
           <div class="logo">
-            <img src="../../assets/index_images/logo-round-600px.png">
+            <img :src="profile(assInfo.profile)">
           </div>
         </div>
         <div class="right">
           <div class="name">
-            <strong>Easy社团</strong>
+            <strong>{{assInfo.name}}</strong>
           </div>
           <div class="intro_content">
-            社团简介
+            {{assInfo.intro}}
           </div>
           <div class="other_mes">
-            <small>社团负责人：黄梓圭</small>
-            <small>社团单位：信息技术学院</small>
+            <small>社团负责人：{{assInfo.principal}}</small>
+            <small>社团单位：{{assInfo.org}}</small>
           </div>
         </div>
       </div>
       <div class="email_box box_shadow">
         <div class="title"><strong>社团邮箱</strong></div>
+        <h4 v-show="mail === [] || mail === null" style="text-align: center;">暂无数据</h4>
         <div class="emails scroll_height">
-          <div v-for="item in 12" class="email">
+          <div v-for="item in mail" :key="item.mid" class="email">
             <div class="tag">
-              <el-tag v-show="item%2 == 0" size="mini" type="danger">未读</el-tag>
-              <el-tag v-show="item%2 != 0" size="mini" type="success">已读</el-tag>
+              <el-tag v-show="isRead == 0" size="mini" type="danger">未读</el-tag>
+              <el-tag v-show="isRead != 0" size="mini" type="success">已读</el-tag>
             </div>
             <div class="email_title">
-              <small>邮件标题</small>
+              <small>{{item.title}}</small>
             </div>
             <div class="time">
-              <small>2021-11-23</small>
+              <small>{{item.date}}</small>
             </div>
           </div>
         </div>
@@ -55,7 +56,7 @@
           </svg>
           <div class="show">
             <div class="num">
-              <strong>45位</strong>
+              <strong>{{showInfo.headcount}}位</strong>
             </div>
             <div class="title">
               社团成员数量
@@ -63,7 +64,7 @@
           </div>
         </div>
         <div class="time">
-          <small>最后一位成员加入时间：2021-11-23</small>
+          <small>最后一位成员加入时间：{{showInfo.finalMember}}</small>
         </div>
       </div>
       <div class="notice_num box_shadow">
@@ -79,7 +80,7 @@
           </svg>
           <div class="show">
             <div class="num">
-              <strong>1024</strong>
+              <strong>{{showInfo.postcount}}</strong>
             </div>
             <div class="title">
               论坛发帖总数
@@ -87,7 +88,7 @@
           </div>
         </div>
         <div class="time">
-          <small>最后一次发帖时间：2021-11-23</small>
+          <small>最后一次发帖时间：{{showInfo.finalPost}}</small>
         </div>
       </div>
       <div class="activity_num box_shadow">
@@ -100,7 +101,7 @@
           </svg>
           <div class="show">
             <div class="num">
-              <strong>1个</strong>
+              <strong>{{showInfo.actioncount}}个</strong>
             </div>
             <div class="title">
               待举办活动数量
@@ -108,7 +109,7 @@
           </div>
         </div>
         <div class="time">
-          <small>下一个举办活动：暴揍甲方</small>
+          <small>下一个举办活动：{{showInfo.nextAction === "" ? "暂无": showInfo.nextAction}}</small>
         </div>
       </div>
     </div>
@@ -139,83 +140,173 @@
     mapGetters
   } from 'vuex'
   import {
-    getFixedShowInfo
+    getFixedShowInfo,
+    getAssMails,
+    getPersonAct
   } from '@/api/user'
+  import base from '@/api/base.js'
 
   export default {
     name: 'Dashboard',
     data() {
       return {
-        value: false
+        value: false,
+        assInfo: {},
+        showInfo: {},
+        mail: [],
+        personage: [],
       }
     },
     computed: {
       ...mapGetters([
-        'name'
+        'name',
+        'aid'
       ])
     },
     methods: {
       /* 获取固定展示信息 */
       getFixedShowInfo() {
-       getFixedShowInfo().then(
-         res => {
-       
-         }
-       ) 
-      }
-    },
-    mounted() {
+        return new Promise((resolve, reject) => {
+          getFixedShowInfo(this.aid).then(
+            res => {
+              this.assInfo = res.data.data.assInfo
+              this.showInfo = res.data.data.showInfo
+              console.log(res.data)
+              resolve()
+            }
+          )
+        })
+      },
+      /* 重写社团logo路径 */
+      profile(profile) {
+        return `${base.sq}${profile}`
+      },
+      /* 获取邮箱简要信息 */
+      getAssMails() {
+        return new Promise((resolve, reject) => {
+          getAssMails(this.aid).then(
+            res => {
+              this.mail = res.data.data.mail
+              console.log(res.data)
+              resolve()
+            }
+          )
+        })
+      },
+      /* 获取个人活跃度 */
+      getPersonAct() {
+        return new Promise((resolve, reject) => {
+          getPersonAct(this.aid).then(
+            res => {
+              this.personage = res.data.data
+              resolve()
+            }
+          )
+        })
+      },
+      /* 生成表格 */
+      async setEchar() {
+        await this.getFixedShowInfo()
+        await this.getAssMails()
+        await this.getPersonAct()
+        // 1. 基于准备好的dom，初始化echarts实例
+        let personal = this.$echarts.init(document.getElementById('personal'))
+        let club = this.$echarts.init(document.getElementById('club'))
+        // 2. 发起请求，获取数据
+        // const { data: res } = this.$http.get('reports/type/1')
+        // if (res.meta.status !== 200) {
+        //    return this.$message.error('获取折线图数据失败！')
+        // }
+        // 3. 使用刚指定的配置项和数据，显示图表
+        let xAxisData = this.personage.reduce((item, next) => {
+          item.push(next.name);
+          return item;
+        }, []);
+        let seriesData = this.personage.reduce((item, next) => {
+          item.push(next.num);
+          return item;
+        }, []);
+        console.log(xAxisData,seriesData)
+        let personal_option = {
+          title: {
+            text: "个人活跃度",
+          },
+          color: '#73b7ff',
+          tooltip: {},
+          legend: {
+            data: ["活跃度"],
+          },
+          xAxis: {
+            data: xAxisData,
+          },
+          yAxis: {
+            // type: 'category',
 
-
-
-      // 1. 基于准备好的dom，初始化echarts实例
-      let personal = this.$echarts.init(document.getElementById('personal'))
-      let club = this.$echarts.init(document.getElementById('club'))
-      // 2. 发起请求，获取数据
-      // const { data: res } = this.$http.get('reports/type/1')
-      // if (res.meta.status !== 200) {
-      //    return this.$message.error('获取折线图数据失败！')
-      // }
-      // 3. 使用刚指定的配置项和数据，显示图表
-
-      let option = {
-        title: {
-          text: "ECharts 入门示例",
-        },
-        color: '#73b7ff',
-        tooltip: {},
-        legend: {
-          data: ["销量"],
-        },
-        xAxis: {
-          data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子", "Easy"],
-        },
-        yAxis: {
-          // type: 'category',
-
-        },
-        series: [{
-          name: "销量",
-          type: "line",
-          barWidth: 20,
-          data: [5, 20, 36, 10, 10, 20, 100],
-          itemStyle: {
-            normal: {
-              label: {
-                show: true, //开启显示
-                position: 'right', //在上方显示
-                textStyle: { //数值样式
-                  color: 'black',
-                  fontSize: 16
+          },
+          series: [{
+            name: "活跃度",
+            type: "bar",
+            barWidth: 20,
+            data: seriesData,
+            itemStyle: {
+              normal: {
+                label: {
+                  show: true, //开启显示
+                  position: 'top', //在上方显示
+                  textStyle: { //数值样式
+                    color: 'black',
+                    fontSize: 16
+                  }
                 }
               }
             }
-          }
-        }, ],
-      };
+          }, ],
+        };
 
-      personal.setOption(option)
-      club.setOption(option)
+        personal.setOption(personal_option)
+
+
+        let club_option = {
+          title: {
+            text: "社团活跃度",
+          },
+          color: '#73b7ff',
+          tooltip: {},
+          legend: {
+            data: ["销量"],
+          },
+          xAxis: {
+            data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子", "Easy"],
+          },
+          yAxis: {
+            // type: 'category',
+
+          },
+          series: [{
+            name: "销量",
+            type: "line",
+            barWidth: 20,
+            data: [5, 20, 36, 10, 10, 20, 100],
+            itemStyle: {
+              normal: {
+                label: {
+                  show: true, //开启显示
+                  position: 'right', //在上方显示
+                  textStyle: { //数值样式
+                    color: 'black',
+                    fontSize: 16
+                  }
+                }
+              }
+            }
+          }, ],
+        };
+
+        club.setOption(club_option)
+      }
+    },
+    mounted() {
+      this.setEchar()
     }
   }
 </script>
