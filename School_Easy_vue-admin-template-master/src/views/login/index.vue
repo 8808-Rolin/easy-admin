@@ -49,6 +49,9 @@
 <script>
 import { validUsername } from '@/utils/validate'
 import crypto from 'crypto'
+import {
+  getInfo
+} from '@/api/user'
 
 export default {
   name: 'Login',
@@ -109,11 +112,22 @@ export default {
           let md5 = crypto.createHash("md5"); //md5加密对象
           md5.update(this.loginForm.password) //需要加密的密码
           this.loginForm.password = md5.digest('hex'); //password 加密完的密码
-          this.$store.dispatch('user/login', this.loginForm).then(res => {
+          this.$store.dispatch('user/login', this.loginForm).then(async res => {
+            let level = 0
+            await getInfo(res.data.data.uid).then(res => { level = res.data.data.user.level })
             if (res.data.data.code === 0) {
-              this.message = this.$message.success(res.data.data.msg)
-              this.$router.push({ path: this.redirect || '/' })
-              this.loading = false
+              console.log(level)
+              if (level === 2) {
+                this.message = this.$message.success(res.data.data.msg)
+                this.$router.push({ path: '/' })
+                this.loading = false
+              } else {
+                await this.$store.dispatch('user/logout')
+                this.message = this.$message.error("你无管理员权限")
+                this.loginForm.password = ''
+                this.loading = false
+              }
+
             } else {
               this.message = this.$message.error(res.data.data.msg)
               this.loading = false

@@ -3,7 +3,7 @@
     <el-alert :closable="false" title="活动一览" />
 
     <div class="table">
-      <el-table :data="tableData" height="520" fit style="width: 100%">
+      <el-table :data="action" height="520" fit style="width: 100%">
         <el-table-column type="index">
         </el-table-column>
         <el-table-column prop="assname" label="社团名字">
@@ -24,8 +24,8 @@
         <el-table-column prop="status" label="活动状态">
           <template slot-scope="scope">
             <el-tag v-show="scope.row.status === 1" type="success" size="mini">通过</el-tag>
-            <el-tag v-show="scope.row.status !== 1&&scope.row.status !== 0" type="danger" size="mini">未审核</el-tag>
-            <el-tag v-show="scope.row.status === 0" type="warning" size="mini">不通过</el-tag>
+            <el-tag v-show="scope.row.status !== 1&&scope.row.status !== 0" type="danger" size="mini">未通过</el-tag>
+            <el-tag v-show="scope.row.status === 0" type="warning" size="mini">未审核</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="90">
@@ -45,55 +45,35 @@
       <div class="show">
         <p><label>活动标题：</label><span>{{dialogShow.title}}</span></p>
         <p><label>举办社团：</label><span>{{dialogShow.assname}}</span></p>
-        <p><label>举办地点：</label>{{dialogShow.position}}</p>
         <p><label>活动内容：</label>{{dialogShow.content}}</p>
         <p><label>开始时间：</label>{{dialogShow.startTime}}</p>
         <p><label>结束时间：</label>{{dialogShow.endTime}}</p>
         <p>
           <label>活动状态：</label>
           <el-tag v-show="dialogShow.status === 1" type="success" size="mini">通过</el-tag>
-          <el-tag v-show="dialogShow.status !== 1 && dialogShow.status !== 0" type="danger" size="mini">未审核</el-tag>
-          <el-tag v-show="dialogShow.status === 0" type="warning" size="mini">不通过</el-tag>
+          <el-tag v-show="dialogShow.status !== 1 && dialogShow.status !== 0" type="danger" size="mini">不通过</el-tag>
+          <el-tag v-show="dialogShow.status === 0" type="warning" size="mini">待审核</el-tag>
         </p>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button v-show="dialogShow.status !== 1 && dialogShow.status !== 0" type="danger" @click="centerDialogVisible = false">拒绝</el-button>
-        <el-button v-show="dialogShow.status !== 1 && dialogShow.status !== 0" type="primary" @click="centerDialogVisible = false">通过</el-button>
-        <el-button v-show="dialogShow.status === 1 || dialogShow.status === 0" type="infor" @click="centerDialogVisible = false">关闭</el-button>
+        <el-button v-show="dialogShow.status == 0" type="danger" @click="sendActReply(dialogShow.actid, 0)">拒绝</el-button>
+        <el-button v-show="dialogShow.status == 0" type="primary" @click="sendActReply(dialogShow.actid, 1)">通过</el-button>
+        <el-button v-show="dialogShow.status === 1 || dialogShow.status === 2" type="infor" @click="centerDialogVisible = false">关闭</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
+  import {
+    getActionList,
+    sendActReply,
+  } from '@/api/user'
+
   export default {
     data() {
       return {
-        tableData: [{
-          assname: '福布斯富豪团',
-          title: '暴揍甲方',
-          content: '暴揍甲方，可以发动任何形式的攻击',
-          position: '30栋202',
-          startTime: '2021-11-26 00:00:00',
-          endTime: '2021-11-30 23:59:59',
-          status: 0,
-        }, {
-          assname: '福布斯富豪团',
-          title: '暴揍甲方',
-          content: '暴揍甲方，可以发动任何形式的攻击',
-          position: '30栋202',
-          startTime: '2021-11-26 00:00:00',
-          endTime: '2021-11-30 23:59:59',
-          status: 1,
-        }, {
-          assname: '福布斯富豪团',
-          title: '暴揍甲方',
-          content: '暴揍甲方，可以发动任何形式的攻击',
-          position: '30栋202',
-          startTime: '2021-11-26 00:00:00',
-          endTime: '2021-11-30 23:59:59',
-          status: 2,
-        }],
+        action:[],
         centerDialogVisible: false,
         dialogShow: {
           assname: '',
@@ -103,15 +83,44 @@
           startTime: '',
           endTime: '',
           status: '',
-        }
+        },
+        message:null,
       }
     },
     methods: {
       checkRow(val) {
         this.dialogShow = val
         this.centerDialogVisible = true
+      },
+      /* 获取活动 */
+      getActionList() {
+        getActionList(0).then(
+          res => {
+            this.action = res.data.data.action
+            console.log(res.data)
+          }
+        )
+      },
+      /* 审批操作 */
+      sendActReply(actid, status) {
+        if (this.message !== null) this.message.close()
+        sendActReply(actid, status).then(
+          res => {
+            if (res.data.data.code >= 0) {
+              this.message = this.$message.success(res.data.data.msg)
+              this.getActionList()
+              this.centerDialogVisible = false
+            } else {
+              this.message = this.$message.error(res.data.data.msg)
+            }
+          }
+        )
       }
+
     },
+    mounted() {
+      this.getActionList()
+    }
   }
 </script>
 

@@ -1,6 +1,5 @@
 import {
   login,
-  logout,
   getInfo
 } from '@/api/user'
 import {
@@ -18,6 +17,7 @@ const getDefaultState = () => {
     uid: 0,
     name: '',
     avatar: '',
+    aid:0,
   }
 }
 
@@ -38,6 +38,9 @@ const mutations = {
   },
   SET_UID: (state, uid) => {
     state.uid = uid
+  },
+  SET_AID: (state, aid) => {
+    state.aid = aid
   }
 }
 
@@ -97,20 +100,10 @@ const actions = {
   },
 
   // user logout
-  logout({
-    commit,
-    state
-  }) {
-    return new Promise((resolve, reject) => {
-      logout(state.token).then(() => {
-        removeToken() // must remove  token  first
-        resetRouter()
-        commit('RESET_STATE')
-        resolve()
-      }).catch(error => {
-        reject(error)
-      })
-    })
+  logout({commit}) {
+    removeToken() // must remove  token  first
+    resetRouter()
+    commit('RESET_STATE')
   },
 
   // remove token

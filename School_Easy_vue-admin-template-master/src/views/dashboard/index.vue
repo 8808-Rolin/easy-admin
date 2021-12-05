@@ -107,7 +107,7 @@
     },
     computed: {
       ...mapGetters([
-        'name'
+        'name',
       ])
     },
     mounted() {

@@ -20,10 +20,10 @@
         </el-table-column>
       </el-table>
     </div>
-    <div class="pagination">
+    <!-- <div class="pagination">
       <el-pagination background layout="prev, pager, next" :total="1000">
       </el-pagination>
-    </div>
+    </div> -->
   </div>
 </template>
 
