@@ -3,11 +3,11 @@
     <el-alert :closable="false" title="论坛管理" />
 
     <div class="btn_box">
-      <el-button type="primary" size="medium" @click="centerDialogVisible2 = true">发表帖子</el-button>
+      <!-- <el-button type="primary" size="medium" @click="toCommunty">发表帖子</el-button> -->
     </div>
 
     <div class="table">
-      <el-table :data="tableData" height="550" fit style="width: 100%">
+      <el-table :data="posts" fit style="width: 100%">
         <el-table-column type="index">
         </el-table-column>
         <el-table-column prop="postType" label="帖子类型">
@@ -29,14 +29,15 @@
         </el-table-column>
         <el-table-column label="操作" width="150">
           <template slot-scope="scope">
-            <el-button type="primary" size="mini" @click="centerDialogVisible = true">查看</el-button>
-            <el-button type="danger" size="mini">删除</el-button>
+            <!-- <el-button type="primary" size="mini" @click="centerDialogVisible = true">查看</el-button> -->
+            <el-button type="danger" size="mini" @click="deletePostDiscuss(scope.row.pid)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
     </div>
     <div class="pagination">
-      <el-pagination background layout="prev, pager, next" :total="1000">
+      <el-pagination background layout="total, prev, pager, next, jumper" hide-on-single-page
+        @current-change="handleCurrentChange" :current-page.sync="currentPage" :page-size="pageSize" :total="total">
       </el-pagination>
     </div>
 
@@ -59,7 +60,7 @@
     </el-dialog>
 
     <!-- 发表帖子 -->
-    <el-dialog title="发表帖子" :visible.sync="centerDialogVisible2" width="80%">
+    <el-dialog title="发表帖子" :visible.sync="centerDialogVisible2" width="80%" :append-to-body="true">
       <div class="show">
         <div class="meal_wrap">
           <!-- <div>
@@ -105,32 +106,18 @@
 
 <script>
   import TEditor from '../tinymce.vue'
+  import {
+    getPostList,
+    deletePostDiscuss,
+  } from '@/api/user'
+  import {
+    mapGetters
+  } from 'vuex'
+  import base from '@/api/base.js';
 
   export default {
     data() {
       return {
-        tableData: [{
-          postType: '福布斯富豪团',
-          postTitle: '暴揍甲方',
-          postAuthor: '暴揍甲方，可以发动任何形式的攻击',
-          replies: '30栋202',
-          replyTime: '2021-11-26 00:00:00',
-          releaseTime: '2021-11-30 23:59:59',
-        }, {
-          postType: '福布斯富豪团',
-          postTitle: '暴揍甲方',
-          postAuthor: '暴揍甲方，可以发动任何形式的攻击',
-          replies: '30栋202',
-          replyTime: '2021-11-26 00:00:00',
-          releaseTime: '2021-11-30 23:59:59',
-        }, {
-          postType: '福布斯富豪团',
-          postTitle: '暴揍甲方',
-          postAuthor: '暴揍甲方，可以发动任何形式的攻击',
-          replies: '30栋202',
-          replyTime: '2021-11-26 00:00:00',
-          releaseTime: '2021-11-30 23:59:59',
-        }],
         centerDialogVisible: false,
         centerDialogVisible2: false,
         // 富文本
@@ -141,30 +128,102 @@
         inputVisible: false,
         inputValue: '',
         content: '',
+
+        currentPage: 1,
+        total: 0,
+        pageSize: 10,
+        systemPost: [],
+        commonPost: [],
+        posts: [],
       }
     },
     components: {
       TEditor
     },
+    computed: {
+      ...mapGetters([
+        'aid'
+      ]),
+    },
     methods: {
+      /* 获取帖子 */
+      getPostList(type, page, limit) {
+        return new Promise((resolve, reject) => {
+          getPostList(this.aid, type, page, limit).then(
+            res => {
+              if (res.data.data.code > 0) {
+                if (type === 1) this.systemPost = res.data.data.posts
+                else {
+                  this.commonPost = res.data.data.posts
+                  this.total = res.data.data.code
+                }
+              }
+              console.log(res.data)
+              resolve()
+            }
+          )
+        })
+      },
       // 标签添加
       handleClose(tag) {
-      	this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
+        this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
       },
       showInput() {
-      	this.inputVisible = true;
-      	this.$nextTick(_ => {
-      		this.$refs.saveTagInput.$refs.input.focus();
-      	});
+        this.inputVisible = true;
+        this.$nextTick(_ => {
+          this.$refs.saveTagInput.$refs.input.focus();
+        });
       },
       handleInputConfirm() {
-      	let inputValue = this.inputValue;
-      	if (inputValue) {
-      		this.dynamicTags.push(inputValue);
-      	}
-      	this.inputVisible = false;
-      	this.inputValue = '';
+        let inputValue = this.inputValue;
+        if (inputValue) {
+          this.dynamicTags.push(inputValue);
+        }
+        this.inputVisible = false;
+        this.inputValue = '';
       },
+      /* 页面切换 */
+      async handleCurrentChange(val) {
+        this.currentPage = val
+        await this.getPostList(2, val, this.pageSize)
+        this.posts = []
+        this.posts.push(...this.commonPost)
+        this.posts.unshift(...this.systemPost)
+      },
+      /* 重写帖子列表 */
+      async getPosts() {
+        let currentPage = this.currentPage
+        if (this.currentPage > 1 && (this.currentPage-1) * 10 <= this.total) {
+          console.log("=========")
+          currentPage = this.currentPage -1
+        }
+
+        await this.getPostList(1, 1, this.pageSize)
+        await this.getPostList(2, currentPage, this.pageSize)
+        this.posts = []
+        this.posts.push(...this.commonPost)
+        this.posts.unshift(...this.systemPost)
+        console.log(this.posts, "===")
+      },
+      /* 删除贴子 */
+      deletePostDiscuss(typeid) {
+        let requestType = 0
+        deletePostDiscuss(requestType, typeid).then(
+          res => {
+            if (res.data.data.code === 0) {
+              this.commonPost = []
+              this.systemPost = []
+              this.getPosts()
+              this.$message.success(res.data.data.msg)
+            } else {
+              this.$message.error(res.data.data.msg)
+            }
+          }
+        )
+      }
+    },
+    mounted() {
+      this.getPosts()
     }
   }
 </script>

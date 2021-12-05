@@ -3,7 +3,7 @@
     <el-alert :closable="false" title="活动一览" />
 
     <div class="table">
-      <el-table :data="tableData" height="550" fit style="width: 100%">
+      <el-table :data="action" height="550" fit style="width: 100%">
         <el-table-column type="index">
         </el-table-column>
         <el-table-column prop="assname" label="社团名字">
@@ -14,10 +14,6 @@
               <span>{{scope.row.title}}</span>
             </el-tooltip>
           </template>
-        </el-table-column>
-        <el-table-column prop="content" label="活动内容">
-        </el-table-column>
-        <el-table-column prop="position" label="举办地点">
         </el-table-column>
         <el-table-column prop="startTime" label="开始时间">
         </el-table-column>
@@ -32,38 +28,37 @@
         </el-table-column>
         <el-table-column label="操作" width="90">
           <template slot-scope="scope">
-            <el-button type="primary" size="mini" @click="centerDialogVisible = true">查看</el-button>
+            <el-button type="primary" size="mini" @click="getActionInfo(scope.row.actid);getActionMember(scope.row.actid)">查看</el-button>
           </template>
         </el-table-column>
       </el-table>
     </div>
-    <div class="pagination">
+    <!-- <div class="pagination">
       <el-pagination background layout="prev, pager, next" :total="1000">
       </el-pagination>
-    </div>
+    </div> -->
 
     <!-- 对话框，活动详情 -->
     <el-dialog title="活动详情" :visible.sync="centerDialogVisible" width="61.8%" center>
       <div class="show">
         <el-tabs type="border-card">
           <el-tab-pane label="活动内容">
-            <p><label>活动标题：</label></p>
-            <p><label>举办社团：</label></p>
-            <p><label>举办地点：</label></p>
-            <p><label>活动内容：</label></p>
-            <p><label>开始时间：</label></p>
-            <p><label>结束时间：</label></p>
-            <p><label>活动状态：</label></p>
+            <p><label>活动标题：{{activeMes.title}}</label></p>
+            <p><label>举办地点：{{activeMes.position}}</label></p>
+            <p>活动内容：<label v-html="activeMes.content"></label></p>
+            <p><label>发布时间：{{activeMes.releaseDate}}</label></p>
+            <p><label>开始时间：{{activeMes.startDate}}</label></p>
+            <p><label>结束时间：{{activeMes.overDate}}</label></p>
           </el-tab-pane>
           <el-tab-pane label="参加人员">
-            <el-table :data="tableData2" height="350" fit style="width: 100%">
+            <el-table :data="action_member" height="350" fit style="width: 100%">
               <el-table-column type="index">
               </el-table-column>
-              <el-table-column prop="userName" label="用户名">
+              <el-table-column prop="username" label="用户名">
               </el-table-column>
-              <el-table-column prop="studentID" label="学号">
+              <el-table-column prop="student_number" label="学号">
               </el-table-column>
-              <el-table-column prop="college" label="学院">
+              <el-table-column prop="phone" label="电话">
               </el-table-column>
             </el-table>
           </el-tab-pane>
@@ -78,42 +73,80 @@
 </template>
 
 <script>
+  import {
+    getActionList,
+    getActionMember,
+    getActionInfo
+  } from '@/api/user'
+  import {
+    mapGetters
+  } from 'vuex'
+  import base from '@/api/base.js';
+
   export default {
     data() {
       return {
-        tableData: [{
-          assname: '福布斯富豪团',
-          title: '暴揍甲方',
-          content: '暴揍甲方，可以发动任何形式的攻击',
-          position: '30栋202',
-          startTime: '2021-11-26 00:00:00',
-          endTime: '2021-11-30 23:59:59',
-          status: 0,
-        },{
-          assname: '福布斯富豪团',
-          title: '暴揍甲方',
-          content: '暴揍甲方，可以发动任何形式的攻击',
-          position: '30栋202',
-          startTime: '2021-11-26 00:00:00',
-          endTime: '2021-11-30 23:59:59',
-          status: 1,
-        },{
-          assname: '福布斯富豪团',
-          title: '暴揍甲方',
-          content: '暴揍甲方，可以发动任何形式的攻击',
-          position: '30栋202',
-          startTime: '2021-11-26 00:00:00',
-          endTime: '2021-11-30 23:59:59',
-          status: 2,
-        }],
-        tableData2: [{
-          userName: '王小虎',
-          studentID: '2019060703300',
-          college: '信息技术学院',
-        }],
+        action:[],
+        action_member:[],
+        activeMes:{},
         centerDialogVisible: false
       }
     },
+    computed: {
+      ...mapGetters([
+        'aid'
+      ]),
+    },
+    methods: {
+      /* 获取活动 */
+      getActionList() {
+        getActionList(this.aid).then(
+          res => {
+            this.action = res.data.data.action
+            console.log(res.data)
+          }
+        )
+      },
+      /* 获取参加人员 */
+      getActionMember(actid) {
+        getActionMember(actid).then(
+          res => {
+            if (res.data.data.code !== -1) {
+              this.action_member = res.data.data.action_member
+              /* let user = {
+                userName:'李四',
+                studentID:'1231231',
+                college:'hhhh',
+              }
+              this.action_member = [user,user,user,user,user] */
+              console.log(res.data)
+            } else {
+              this.$message.error(res.data.data.msg)
+            }
+
+          }
+        )
+      },
+      /* 获取活动具体内容 */
+      getActionInfo(actid) {
+        console.log(actid)
+        getActionInfo(actid).then(
+          res => {
+            if (res.data.data.code === 0) {
+              this.activeMes = res.data.data
+              this.centerDialogVisible = true
+              console.log(res.data)
+            } else {
+              this.$message.error(res.data.data.msg)
+            }
+
+          }
+        )
+      },
+    },
+    mounted() {
+      this.getActionList()
+    }
   }
 </script>
 

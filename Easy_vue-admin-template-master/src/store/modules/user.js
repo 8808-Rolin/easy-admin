@@ -6,6 +6,7 @@ import {
   getToken,
   setToken,
   getAid,
+  getUid,
   removeToken
 } from '@/utils/auth'
 import {
@@ -19,7 +20,7 @@ const getDefaultState = () => {
     name: '',
     avatar: '',
     aid:getAid(),
-    studentID:'',
+    studentID:getUid(),
   }
 }
 

@@ -142,7 +142,8 @@
   import {
     getFixedShowInfo,
     getAssMails,
-    getPersonAct
+    getPersonAct,
+    getDailyAct
   } from '@/api/user'
   import base from '@/api/base.js'
 
@@ -155,6 +156,7 @@
         showInfo: {},
         mail: [],
         personage: [],
+        daily:[],
       }
     },
     computed: {
@@ -198,17 +200,31 @@
         return new Promise((resolve, reject) => {
           getPersonAct(this.aid).then(
             res => {
-              this.personage = res.data.data
+              if (res.data.code !== -1) this.personage = res.data.data
               resolve()
             }
           )
         })
       },
+      /* 获取社团活跃度 */
+      getDailyAct() {
+        return new Promise((resolve, reject) => {
+          getDailyAct(this.aid).then(
+            res => {
+              if (res.data.data.code !== -1) this.daily = res.data.data.daily
+              resolve()
+            }
+          )
+        })
+      },
+
+
       /* 生成表格 */
       async setEchar() {
         await this.getFixedShowInfo()
         await this.getAssMails()
         await this.getPersonAct()
+        await this.getDailyAct()
         // 1. 基于准备好的dom，初始化echarts实例
         let personal = this.$echarts.init(document.getElementById('personal'))
         let club = this.$echarts.init(document.getElementById('club'))
@@ -226,6 +242,16 @@
           item.push(next.num);
           return item;
         }, []);
+
+        let dailyxAxisData = this.daily.reduce((item, next) => {
+          item.push(next.date);
+          return item;
+        }, []);
+        let dailyseriesData = this.daily.reduce((item, next) => {
+          item.push(next.num);
+          return item;
+        }, []);
+
         console.log(xAxisData,seriesData)
         let personal_option = {
           title: {
@@ -273,20 +299,20 @@
           color: '#73b7ff',
           tooltip: {},
           legend: {
-            data: ["销量"],
+            data: ["活跃度"],
           },
           xAxis: {
-            data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子", "Easy"],
+            data: dailyxAxisData.reverse(),
           },
           yAxis: {
             // type: 'category',
 
           },
           series: [{
-            name: "销量",
+            name: "活跃度",
             type: "line",
             barWidth: 20,
-            data: [5, 20, 36, 10, 10, 20, 100],
+            data: dailyseriesData.reverse(),
             itemStyle: {
               normal: {
                 label: {
