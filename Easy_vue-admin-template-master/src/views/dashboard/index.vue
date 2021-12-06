@@ -56,8 +56,7 @@
           </svg>
           <div class="show">
             <div class="num">
-              <!-- <strong>{{showInfo.headcount}}位</strong> -->
-              <strong>143 位</strong>
+              <strong>{{showInfo.headcount}}位</strong>
             </div>
             <div class="title">
               社团成员数量
@@ -81,8 +80,7 @@
           </svg>
           <div class="show">
             <div class="num">
-              <!-- <strong>{{showInfo.postcount}}</strong> -->
-              <strong>1968</strong>
+              <strong>{{showInfo.postcount}}</strong>
             </div>
             <div class="title">
               论坛发帖总数
@@ -90,7 +88,6 @@
           </div>
         </div>
         <div class="time">
-          <!-- <small>最后一次发帖时间：{{showInfo.finalPost}}</small> -->
           <small>最后一次发帖时间：{{showInfo.finalPost}}</small>
         </div>
       </div>
@@ -254,6 +251,11 @@
           item.push(next.num);
           return item;
         }, []);
+        
+        if (xAxisData == null) xAxisData = []
+        if (seriesData == null) seriesData = []
+        if (dailyxAxisData == null) dailyxAxisData = []
+        if (dailyseriesData == null) dailyseriesData = []
         // xAxisData = ['跳梁小丑的爱情', '梦里寻她', '十二月的奇迹！！', '晨歌', 'veryquickly', '氯磷Rolin', '幽', '自由娘', '■□｀薄情少年/cc']
         // seriesData = [2.33, 3.14, 5.11, 3.21, ...seriesData, 9.32]
         // dailyxAxisData = [...dailyxAxisData]
