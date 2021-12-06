@@ -27,7 +27,11 @@
 
     <!-- 对话框，审核内容展示 -->
     <el-dialog title="提示" :visible.sync="centerDialogVisible" width="30%" center>
-      <span v-html="text"></span>
+      <span>
+        <div><label>标题：</label><span></span></div>
+        <div><label>内容：</label><span></span></div>
+        <div><label>附件：</label><span v-html="text"></span></div>
+      </span>
       <span slot="footer" class="dialog-footer">
         <el-button @click="centerDialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="centerDialogVisible = false">确 定</el-button>

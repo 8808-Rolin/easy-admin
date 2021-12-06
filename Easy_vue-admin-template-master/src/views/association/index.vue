@@ -59,7 +59,7 @@
     </el-dialog>
 
     <!-- 发表帖子 -->
-    <el-dialog title="发表帖子" :visible.sync="centerDialogVisible2" width="80%">
+    <el-dialog title="发表帖子" :visible.sync="centerDialogVisible2" width="80%" :append-to-body="true">
       <div class="show">
         <div class="meal_wrap">
           <!-- <div>
@@ -75,7 +75,7 @@
             </el-select>
             <el-input v-model="input" placeholder="请输入内容"></el-input>
           </div>
-          <div class="tinymce-box">
+          <div id="tinymce_box" class="tinymce-box">
             <TEditor ref="tinymceRef" :updateContent.sync="content"></TEditor>
           </div>
           <!-- <div>富文本框内容：{{tinymceObj}}</div> -->
@@ -266,5 +266,10 @@
     width: 90px;
     margin-left: 10px;
     vertical-align: bottom;
+  }
+
+  >>>.el-dialog__wrapper {
+    background-color: #000000;
+    z-index: 1299!important;
   }
 </style>

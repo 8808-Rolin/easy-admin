@@ -16,6 +16,7 @@ import '@/icons' // icon
 import '@/permission' // permission control
 
 import './assets/icon/iconfont.css' // 引用我的图标
+
 // 引用echarts
 // import echarts from "echarts";
 import * as echarts from 'echarts';
