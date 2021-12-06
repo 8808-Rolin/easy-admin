@@ -1,69 +1,63 @@
 <template>
   <div style="padding:30px;">
-    <el-alert :closable="false" title="活动一览" />
+    <el-alert :closable="false" title="社团管理员任免" />
 
     <div class="btn_box">
-      <el-select v-model="value" filterable placeholder="请选择">
-        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+      <el-select @change="getMemberList" v-model="value" filterable placeholder="请选择">
+        <el-option v-for="item in list" :key="item.value" :label="item.name" :value="item.aid">
         </el-option>
       </el-select>
     </div>
 
     <div class="table">
-      <el-table :data="tableData" height="550" fit style="width: 100%">
+      <el-table :data="members" fit style="width: 100%">
         <el-table-column type="index">
         </el-table-column>
-        <el-table-column prop="userName" label="用户昵称">
+        <el-table-column prop="username" label="用户昵称">
         </el-table-column>
-        <el-table-column prop="realName" label="用户姓名" width="150">
+        <el-table-column prop="realname" label="用户姓名" width="150">
         </el-table-column>
         <el-table-column prop="studentID" label="学号">
         </el-table-column>
-        <el-table-column prop="college" label="所属学院">
-        </el-table-column>
+        <!-- <el-table-column prop="college" label="所属学院">
+        </el-table-column> -->
         <el-table-column label="身份">
           <template slot-scope="scope">
-            <el-tag type="success" size="mini" v-show="scope.row.level == 1">社团管理员</el-tag>
-            <el-tag type="warning" size="mini" v-show="scope.row.level == 0">普通社员</el-tag>
+            <el-tag type="success" size="mini" v-show="scope.row.is_admin == 1">社团管理员</el-tag>
+            <el-tag type="warning" size="mini" v-show="scope.row.is_admin == 0">普通社员</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="150">
           <template slot-scope="scope">
-            <el-button type="primary" size="mini" @click="centerDialogVisible = true" v-show="scope.row.level == 0">设为管理员</el-button>
-            <el-button type="danger" size="mini" v-show="scope.row.level == 1">罢免管理员</el-button>
+            <el-button type="primary" size="mini" @click="setAssAdmin(scope.row.uid, 1)"
+              v-show="scope.row.is_admin == 0">设为管理员</el-button>
+            <el-button type="danger" size="mini" @click="setAssAdmin(scope.row.uid, 0)"
+              v-show="scope.row.is_admin == 1">罢免管理员</el-button>
           </template>
         </el-table-column>
       </el-table>
     </div>
-    <div class="pagination">
+    <!-- <div class="pagination">
       <el-pagination background layout="prev, pager, next" :total="1000">
       </el-pagination>
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script>
-  import TEditor from './tinymce.vue'
-
+  import {
+    getAllAss,
+    setAssAdmin,
+    getMemberList
+  } from '@/api/user'
   export default {
     data() {
       return {
-        tableData: [{
-          userName: 'aa',
-          realName: 'ss',
-          studentID: '202002',
-          college: 'eee',
-          level: 1
-        }],
-        options: [{
-          value: '选项1',
-          label: '黄金糕'
-        }],
-        value: ''
+        list: [],
+        members: [],
+        value: 1,
+        message: null,
       }
-    },
-    components: {
-      TEditor
     },
     methods: {
       // 标签添加
@@ -84,6 +78,47 @@
         this.inputVisible = false;
         this.inputValue = '';
       },
+      /* 获取所有社团 */
+      getAllAss() {
+        getAllAss().then(
+          res => {
+            console.log(res.data)
+            if (res.data.data.code >= 0) {
+              this.list = res.data.data.list
+            }
+          }
+        )
+      },
+      /* 设置社员的管理员状态 */
+      setAssAdmin(uid, status) {
+        let aid = this.value
+        setAssAdmin(aid, uid, status).then(
+          async res => {
+            if (res.data.data.code >= 0) {
+              await this.getMemberList(this.value)
+              if (this.message !== null) this.message.close()
+              this.message = this.$message.success(res.data.data.msg)
+            } else {
+              if (this.message !== null) this.message.close()
+              this.message = this.$message.error(res.data.data.msg)
+            }
+          }
+        )
+      },
+      /* 获取社团成员列表 */
+      getMemberList(aid) {
+        getMemberList(aid).then(
+          res => {
+            console.log(res.data)
+            if (res.data.data.code >= 0) this.members = res.data.data.members
+            else this.$message.error(res.data.data.msg)
+          }
+        )
+      },
+    },
+    mounted() {
+      this.getAllAss()
+      this.getMemberList(1)
     }
   }
 </script>

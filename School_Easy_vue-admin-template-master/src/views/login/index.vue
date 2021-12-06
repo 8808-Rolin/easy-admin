@@ -3,7 +3,7 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title">管理员登录</h3>
       </div>
 
       <el-form-item prop="username">
@@ -13,7 +13,7 @@
         <el-input
           ref="username"
           v-model="loginForm.username"
-          placeholder="Username"
+          placeholder="教工号"
           name="username"
           type="text"
           tabindex="1"
@@ -30,7 +30,7 @@
           ref="password"
           v-model="loginForm.password"
           :type="passwordType"
-          placeholder="Password"
+          placeholder="密码"
           name="password"
           tabindex="2"
           auto-complete="on"
@@ -41,25 +41,23 @@
         </span>
       </el-form-item>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
-
-      <div class="tips">
-        <span style="margin-right:20px;">username: admin</span>
-        <span> password: any</span>
-      </div>
-
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;font-size: 1.125rem;" @click.native.prevent="handleLogin">登    录</el-button>
     </el-form>
   </div>
 </template>
 
 <script>
 import { validUsername } from '@/utils/validate'
+import crypto from 'crypto'
+import {
+  getInfo
+} from '@/api/user'
 
 export default {
   name: 'Login',
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
+      if (value === '') {
         callback(new Error('Please enter the correct user name'))
       } else {
         callback()
@@ -74,8 +72,8 @@ export default {
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        username: '',
+        password: ''
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -83,7 +81,8 @@ export default {
       },
       loading: false,
       passwordType: 'password',
-      redirect: undefined
+      redirect: undefined,
+      message:null,
     }
   },
   watch: {
@@ -106,14 +105,38 @@ export default {
       })
     },
     handleLogin() {
+      if (this.message !== null) this.message.close()
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.$store.dispatch('user/login', this.loginForm).then(() => {
-            this.$router.push({ path: this.redirect || '/' })
+          let md5 = crypto.createHash("md5"); //md5加密对象
+          md5.update(this.loginForm.password) //需要加密的密码
+          this.loginForm.password = md5.digest('hex'); //password 加密完的密码
+          this.$store.dispatch('user/login', this.loginForm).then(async res => {
+            let level = 0
+            await getInfo(res.data.data.uid).then(res => { level = res.data.data.user.level })
+            if (res.data.data.code === 0) {
+              console.log(level)
+              if (level === 2) {
+                this.message = this.$message.success(res.data.data.msg)
+                this.$router.push({ path: '/' })
+                this.loading = false
+              } else {
+                await this.$store.dispatch('user/logout')
+                this.message = this.$message.error("你无管理员权限")
+                this.loginForm.password = ''
+                this.loading = false
+              }
+
+            } else {
+              this.message = this.$message.error(res.data.data.msg)
+              this.loading = false
+              this.loginForm.password = ''
+            }
+          }).catch(error => {
+            console.log(error)
             this.loading = false
-          }).catch(() => {
-            this.loading = false
+            this.loginForm.password = ''
           })
         } else {
           console.log('error submit!!')

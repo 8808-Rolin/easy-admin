@@ -26,10 +26,10 @@
         </el-table-column>
       </el-table>
     </div>
-    <div class="pagination">
+   <!-- <div class="pagination">
       <el-pagination background layout="prev, pager, next" :total="1000">
       </el-pagination>
-    </div>
+    </div> -->
 
     <!-- 对话框，用户信息 -->
     <el-dialog title="活动详情" :visible.sync="centerDialogVisible" width="38.2%" center>

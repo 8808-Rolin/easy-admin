@@ -5,35 +5,36 @@
       <div class="intro box_shadow">
         <div class="left">
           <div class="logo">
-            <img src="../../assets/index_images/logo-round-600px.png">
+            <img :src="profile(assInfo.profile)">
           </div>
         </div>
         <div class="right">
           <div class="name">
-            <strong>Easy社团</strong>
+            <strong>{{assInfo.name}}</strong>
           </div>
           <div class="intro_content">
-            社团简介
+            {{assInfo.intro}}
           </div>
           <div class="other_mes">
-            <small>社团负责人：黄梓圭</small>
-            <small>社团单位：信息技术学院</small>
+            <small>社团负责人：{{assInfo.principal}}</small>
+            <small>社团单位：{{assInfo.org}}</small>
           </div>
         </div>
       </div>
       <div class="email_box box_shadow">
         <div class="title"><strong>社团邮箱</strong></div>
+        <h4 v-show="mail === [] || mail === null" style="text-align: center;">暂无数据</h4>
         <div class="emails scroll_height">
-          <div v-for="item in 12" class="email">
+          <div v-for="item in mail" :key="item.mid" class="email">
             <div class="tag">
-              <el-tag v-show="item%2 == 0" size="mini" type="danger">未读</el-tag>
-              <el-tag v-show="item%2 != 0" size="mini" type="success">已读</el-tag>
+              <el-tag v-show="item.isRead == 0" size="mini" type="danger">未读</el-tag>
+              <el-tag v-show="item.isRead != 0" size="mini" type="success">已读</el-tag>
             </div>
             <div class="email_title">
-              <small>邮件标题</small>
+              <small>{{item.title}}</small>
             </div>
             <div class="time">
-              <small>2021-11-23</small>
+              <small>{{item.date}}</small>
             </div>
           </div>
         </div>
@@ -55,7 +56,8 @@
           </svg>
           <div class="show">
             <div class="num">
-              <strong>45位</strong>
+              <!-- <strong>{{showInfo.headcount}}位</strong> -->
+              <strong>143 位</strong>
             </div>
             <div class="title">
               社团成员数量
@@ -63,7 +65,7 @@
           </div>
         </div>
         <div class="time">
-          <small>最后一位成员加入时间：2021-11-23</small>
+          <small>最后一位成员加入时间：{{showInfo.finalMember}}</small>
         </div>
       </div>
       <div class="notice_num box_shadow">
@@ -79,7 +81,8 @@
           </svg>
           <div class="show">
             <div class="num">
-              <strong>1024</strong>
+              <!-- <strong>{{showInfo.postcount}}</strong> -->
+              <strong>1968</strong>
             </div>
             <div class="title">
               论坛发帖总数
@@ -87,15 +90,21 @@
           </div>
         </div>
         <div class="time">
-          <small>最后一次发帖时间：2021-11-23</small>
+          <!-- <small>最后一次发帖时间：{{showInfo.finalPost}}</small> -->
+          <small>最后一次发帖时间：{{showInfo.finalPost}}</small>
         </div>
       </div>
       <div class="activity_num box_shadow">
         <div class="show_data">
-          <svg t="1638169321449" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4620" width="48" height="48"><path d="M413.217 941.535c-9.091 0-18.131-3.635-24.682-10.82-85.925-94.41-224.906-95.323-227.775-95.323h-0.204c-18.131 0-32.933-14.353-33.063-32.15-0.142-17.887 14.467-32.467 32.666-32.666 6.868-0.357 171.028-0.193 277.666 116.971 12.165 13.345 10.974 33.828-2.637 45.761-6.277 5.507-14.144 8.229-21.97 8.229v0zM634.755 941.472c-8.025 0-16.090-2.852-22.459-8.655-13.39-12.153-14.212-32.673-1.792-45.795 110.436-116.997 271.262-116.867 277.602-116.607 18.273 0.193 32.906 14.842 32.706 32.735-0.198 17.791-14.932 32.082-33.035 32.082h-0.261c-2.746 0-138.917 0.879-228.546 95.838-6.477 6.931-15.364 10.401-24.217 10.401v0zM576.516 776.636h-104.691c-3.334 0-6.573-0.487-9.652-1.429-111.758-14.064-206.735-77.685-267.95-179.7-71.060-118.49-87.349-272.017-40.47-382.045 5.053-11.83 16.748-19.639 29.837-19.901l9.941-0.096c62.929 0 121.706 11.666 175.191 34.742 38.65-69.319 82.784-121.921 131.449-156.663 2.575-2.206 5.513-4.055 8.785-5.417v0c10.208-4.339 22.073-3.403 31.413 2.563 1.622 1.038 3.141 2.206 4.531 3.5 48.79 35.127 91.705 86.953 130.559 157.735 54.541-24.176 114.667-36.427 179.251-36.427l10.107 0.096c13.089 0.261 24.783 8.064 29.831 19.901 46.884 110.057 30.625 263.584-40.499 382.068-61.216 101.958-156.158 165.618-267.888 179.706-3.136 0.85-6.374 1.366-9.743 1.366v0zM477.7 711.819h92.934c0.692-0.137 1.412-0.227 2.144-0.323 119.46-13.033 187.974-88.188 224.418-148.887 55.794-93.054 72.711-214.652 43.901-304.167-60.127 1.917-115.229 16.373-163.956 43.079-7.963 4.339-17.382 5.251-25.997 2.655-8.66-2.655-15.834-8.717-19.826-16.719-33.494-67.216-69.41-116.675-109.251-150.38-39.869 33.636-76.574 83.453-109.348 148.463-3.993 7.906-11.065 13.872-19.651 16.526-8.592 2.688-17.842 1.787-25.77-2.428-47.701-25.441-101.516-39.28-160.027-41.163-28.804 89.52-11.892 211.114 43.901 304.133 36.444 60.7 104.918 135.827 224.35 148.887 0.723 0.096 1.45 0.187 2.176 0.323v0zM523.921 969.766c-18.238 0-33.035-14.49-33.035-32.412v-193.13c0-17.922 14.797-32.405 33.035-32.405 18.233 0 33.035 14.484 33.035 32.405v193.13c-0.029 17.922-14.802 32.412-33.035 32.412v0zM523.921 969.766z" p-id="4621" fill="#707070"></path></svg>
+          <svg t="1638169321449" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+            p-id="4620" width="48" height="48">
+            <path
+              d="M413.217 941.535c-9.091 0-18.131-3.635-24.682-10.82-85.925-94.41-224.906-95.323-227.775-95.323h-0.204c-18.131 0-32.933-14.353-33.063-32.15-0.142-17.887 14.467-32.467 32.666-32.666 6.868-0.357 171.028-0.193 277.666 116.971 12.165 13.345 10.974 33.828-2.637 45.761-6.277 5.507-14.144 8.229-21.97 8.229v0zM634.755 941.472c-8.025 0-16.090-2.852-22.459-8.655-13.39-12.153-14.212-32.673-1.792-45.795 110.436-116.997 271.262-116.867 277.602-116.607 18.273 0.193 32.906 14.842 32.706 32.735-0.198 17.791-14.932 32.082-33.035 32.082h-0.261c-2.746 0-138.917 0.879-228.546 95.838-6.477 6.931-15.364 10.401-24.217 10.401v0zM576.516 776.636h-104.691c-3.334 0-6.573-0.487-9.652-1.429-111.758-14.064-206.735-77.685-267.95-179.7-71.060-118.49-87.349-272.017-40.47-382.045 5.053-11.83 16.748-19.639 29.837-19.901l9.941-0.096c62.929 0 121.706 11.666 175.191 34.742 38.65-69.319 82.784-121.921 131.449-156.663 2.575-2.206 5.513-4.055 8.785-5.417v0c10.208-4.339 22.073-3.403 31.413 2.563 1.622 1.038 3.141 2.206 4.531 3.5 48.79 35.127 91.705 86.953 130.559 157.735 54.541-24.176 114.667-36.427 179.251-36.427l10.107 0.096c13.089 0.261 24.783 8.064 29.831 19.901 46.884 110.057 30.625 263.584-40.499 382.068-61.216 101.958-156.158 165.618-267.888 179.706-3.136 0.85-6.374 1.366-9.743 1.366v0zM477.7 711.819h92.934c0.692-0.137 1.412-0.227 2.144-0.323 119.46-13.033 187.974-88.188 224.418-148.887 55.794-93.054 72.711-214.652 43.901-304.167-60.127 1.917-115.229 16.373-163.956 43.079-7.963 4.339-17.382 5.251-25.997 2.655-8.66-2.655-15.834-8.717-19.826-16.719-33.494-67.216-69.41-116.675-109.251-150.38-39.869 33.636-76.574 83.453-109.348 148.463-3.993 7.906-11.065 13.872-19.651 16.526-8.592 2.688-17.842 1.787-25.77-2.428-47.701-25.441-101.516-39.28-160.027-41.163-28.804 89.52-11.892 211.114 43.901 304.133 36.444 60.7 104.918 135.827 224.35 148.887 0.723 0.096 1.45 0.187 2.176 0.323v0zM523.921 969.766c-18.238 0-33.035-14.49-33.035-32.412v-193.13c0-17.922 14.797-32.405 33.035-32.405 18.233 0 33.035 14.484 33.035 32.405v193.13c-0.029 17.922-14.802 32.412-33.035 32.412v0zM523.921 969.766z"
+              p-id="4621" fill="#707070"></path>
+          </svg>
           <div class="show">
             <div class="num">
-              <strong>1个</strong>
+              <strong>{{showInfo.actioncount}}个</strong>
             </div>
             <div class="title">
               待举办活动数量
@@ -103,7 +112,7 @@
           </div>
         </div>
         <div class="time">
-          <small>下一个举办活动：暴揍甲方</small>
+          <small>下一个举办活动：{{showInfo.nextAction === "" ? "暂无": showInfo.nextAction}}</small>
         </div>
       </div>
     </div>
@@ -133,69 +142,237 @@
   import {
     mapGetters
   } from 'vuex'
-
+  import {
+    getFixedShowInfo,
+    getAssMails,
+    getPersonAct,
+    getDailyAct
+  } from '@/api/user'
+  import base from '@/api/base.js'
 
   export default {
     name: 'Dashboard',
     data() {
       return {
-        value: false
+        value: false,
+        assInfo: {},
+        showInfo: {},
+        mail: [],
+        personage: [],
+        daily: [],
       }
     },
     computed: {
       ...mapGetters([
-        'name'
+        'name',
+        'aid'
       ])
     },
-    mounted() {
-      // 1. 基于准备好的dom，初始化echarts实例
-      var personal = this.$echarts.init(document.getElementById('personal'))
-      var club = this.$echarts.init(document.getElementById('club'))
-      // 2. 发起请求，获取数据
-      // const { data: res } = this.$http.get('reports/type/1')
-      // if (res.meta.status !== 200) {
-      //    return this.$message.error('获取折线图数据失败！')
-      // }
-      // 3. 使用刚指定的配置项和数据，显示图表
-
-      var option = {
-        title: {
-          text: "ECharts 入门示例",
-        },
-        color: '#73b7ff',
-        tooltip: {},
-        legend: {
-          data: ["销量"],
-        },
-        xAxis: {
-          data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子", "Easy"],
-        },
-        yAxis: {
-          // type: 'category',
-
-        },
-        series: [{
-          name: "销量",
-          type: "line",
-          barWidth: 20,
-          data: [5, 20, 36, 10, 10, 20, 100],
-          itemStyle: {
-            normal: {
-              label: {
-                show: true, //开启显示
-                position: 'right', //在上方显示
-                textStyle: { //数值样式
-                  color: 'black',
-                  fontSize: 16
-                }
-              }
+    methods: {
+      /* 获取固定展示信息 */
+      getFixedShowInfo() {
+        return new Promise((resolve, reject) => {
+          getFixedShowInfo(this.aid).then(
+            res => {
+              this.assInfo = res.data.data.assInfo
+              this.showInfo = res.data.data.showInfo
+              console.log(res.data)
+              resolve()
             }
-          }
-        }, ],
-      };
+          )
+        })
+      },
+      /* 重写社团logo路径 */
+      profile(profile) {
+        return `${base.sq}${profile}`
+      },
+      /* 获取邮箱简要信息 */
+      getAssMails() {
+        return new Promise((resolve, reject) => {
+          getAssMails(this.aid).then(
+            res => {
+              this.mail = res.data.data.mail.reverse()
+              console.log(res.data)
+              resolve()
+            }
+          )
+        })
+      },
+      /* 获取个人活跃度 */
+      getPersonAct() {
+        return new Promise((resolve, reject) => {
+          getPersonAct(this.aid).then(
+            res => {
+              if (res.data.code !== -1) this.personage = res.data.data
+              resolve()
+            }
+          )
+        })
+      },
+      /* 获取社团活跃度 */
+      getDailyAct() {
+        return new Promise((resolve, reject) => {
+          getDailyAct(this.aid).then(
+            res => {
+              if (res.data.data.code !== -1) this.daily = res.data.data.daily
+              resolve()
+            }
+          )
+        })
+      },
 
-      personal.setOption(option)
-      club.setOption(option)
+
+      /* 生成表格 */
+      async setEchar() {
+        await this.getFixedShowInfo()
+        await this.getAssMails()
+        await this.getPersonAct()
+        await this.getDailyAct()
+        // 1. 基于准备好的dom，初始化echarts实例
+        let personal = this.$echarts.init(document.getElementById('personal'))
+        let club = this.$echarts.init(document.getElementById('club'))
+        // 2. 发起请求，获取数据
+        // const { data: res } = this.$http.get('reports/type/1')
+        // if (res.meta.status !== 200) {
+        //    return this.$message.error('获取折线图数据失败！')
+        // }
+        // 3. 使用刚指定的配置项和数据，显示图表
+        let xAxisData = this.personage.reduce((item, next) => {
+          item.push(next.name);
+          return item;
+        }, []);
+        let seriesData = this.personage.reduce((item, next) => {
+          item.push(next.num);
+          return item;
+        }, []);
+
+        let dailyxAxisData = this.daily.reduce((item, next) => {
+          item.push(next.date);
+          return item;
+        }, []);
+        let dailyseriesData = this.daily.reduce((item, next) => {
+          item.push(next.num);
+          return item;
+        }, []);
+        // xAxisData = ['跳梁小丑的爱情', '梦里寻她', '十二月的奇迹！！', '晨歌', 'veryquickly', '氯磷Rolin', '幽', '自由娘', '■□｀薄情少年/cc']
+        // seriesData = [2.33, 3.14, 5.11, 3.21, ...seriesData, 9.32]
+        // dailyxAxisData = [...dailyxAxisData]
+        // dailyseriesData = [33.12, 12.32, 31.44, 44.2, 27.12, 68.15, 97.34, 53.5, 24.1, 25.7, 65.11, 25.22, 23.5, 56.4,
+        //   78.31
+        // ]
+
+        console.log(xAxisData, seriesData)
+        let personal_option = {
+          title: {
+            text: "个人活跃度",
+          },
+
+          color: '#73b7ff',
+          legend: {
+            data: ["活跃度"],
+          },
+          xAxis: [{
+            axisLabel: {
+              interval: 0,
+              rotate: -25,
+            },
+            data: xAxisData,
+          }],
+          yAxis: {
+            // type: 'category',
+
+          },
+          series: [{
+            name: "活跃度",
+            type: "bar",
+            barWidth: 20,
+            data: seriesData,
+            itemStyle: {
+              normal: {
+                shadowColor: 'rgba(0, 0, 0, 0.5)',
+                shadowBlur: 5,
+                shadowOffsetY: -1,
+                shadowOffsetX: 5,
+                label: {
+                  show: true, //开启显示
+                  position: 'top', //在上方显示
+                  textStyle: { //数值样式
+                    color: 'black',
+                    fontSize: 16
+                  }
+                },
+              },
+
+            }
+          }, ],
+        };
+
+        personal.setOption(personal_option)
+
+
+        let club_option = {
+          title: {
+            text: "社团活跃度",
+          },
+          color: '#73b7ff',
+          legend: {
+            data: ["活跃度"],
+          },
+          xAxis: {
+            axisLabel: {
+              interval: 0,
+              rotate: -25,
+            },
+            data: dailyxAxisData.reverse(),
+          },
+          yAxis: {
+            // type: 'category',
+
+          },
+          series: [{
+            name: "活跃度",
+            type: "line",
+            barWidth: 20,
+            smooth: true,
+            data: dailyseriesData.reverse(),
+            areaStyle: {
+              color: {
+                type: 'linear',
+                x: 0,
+                y: 0,
+                x2: 0,
+                y2: 1,
+                colorStops: [{
+                  offset: 0,
+                  color: 'rgba(175,231,254,1)' // 0% 处的颜色
+                }, {
+                  offset: 1,
+                  color: 'rgba(175,231,254,0)' // 100% 处的颜色
+                }],
+                globalCoord: false // 缺省为 false
+              }
+            },
+            itemStyle: {
+              normal: {
+
+                label: {
+                  show: true, //开启显示
+                  position: 'right', //在上方显示
+                  textStyle: { //数值样式
+                    color: 'black',
+                    fontSize: 16
+                  },
+                }
+              },
+            }
+          }, ],
+        };
+
+        club.setOption(club_option)
+      }
+    },
+    mounted() {
+      this.setEchar()
     }
   }
 </script>
@@ -228,6 +405,7 @@
     margin-right: 2rem;
     padding: 1rem;
     display: flex;
+    border-top: 3.25rem solid #b2d8f5;
   }
 
   .club_mes .intro .left {
@@ -235,8 +413,8 @@
   }
 
   .club_mes .intro .left .logo {
-    width: 6rem;
-    height: 6rem;
+    width: 9rem;
+    height: 9rem;
     margin: auto;
     border-radius: 50%;
     overflow: hidden;
@@ -455,5 +633,17 @@
   .chart .chart_show .transform_x {
     transform: translateX(-100%);
     transition: all .3s;
+  }
+
+  >>>#personal>div,
+  >>>#club>div {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  >>>#personal>div canvas,
+  >>>#club>div canvas {
+    width: 100% !important;
+    height: 100% !important;
   }
 </style>

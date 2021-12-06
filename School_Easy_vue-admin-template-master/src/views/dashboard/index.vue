@@ -78,8 +78,8 @@
           数据展示
         </div>
         <div class="btn">
-          <el-switch v-model="value" active-color="#ffffff" inactive-color="#ffffff" active-text="社团活跃度"
-            inactive-text="个人活跃度">
+          <el-switch v-model="value" active-color="#ffffff" inactive-color="#ffffff" active-text="系统活跃度"
+            inactive-text="社团活跃度">
           </el-switch>
         </div>
       </div>
@@ -107,7 +107,7 @@
     },
     computed: {
       ...mapGetters([
-        'name'
+        'name',
       ])
     },
     mounted() {
@@ -121,29 +121,46 @@
       // }
       // 3. 使用刚指定的配置项和数据，显示图表
 
-      var personal_option = {
+      let xAxisData = ['轻风文学社', '自由天空动漫协会', '涂头代码社', '指尖吉他社', '嘉门', '国学社', '学院偶像部', '一笑斋曲艺社', '乌托邦摄影协会']
+      let seriesData = [2.33, 3.14, 5.11, 3.21, 8.32, 5.31, 31.7, 10.6, 9.32]
+      let dailyxAxisData = [33.12, 12.32, 31.44, 44.2, 27.12, 68.15, 97.34, 53.5, 24.1, 25.7, 65.11, 25.22, 23.5, 56.4,
+        78.31
+      ]
+      let dailyseriesData = [33.12, 12.32, 31.44, 44.2, 27.12, 68.15, 97.34, 53.5, 24.1, 25.7, 65.11, 25.22, 23.5, 56.4,
+        78.31
+      ]
+
+      let personal_option = {
         title: {
-          text: "ECharts 入门示例",
+          text: "社团活跃度",
         },
+
         color: '#73b7ff',
-        tooltip: {},
         legend: {
-          data: ["销量"],
+          data: ["活跃度"],
         },
-        xAxis: {
-          data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子", "Easy"],
-        },
+        xAxis: [{
+          axisLabel: {
+            interval: 0,
+            rotate: -25,
+          },
+          data: xAxisData,
+        }],
         yAxis: {
           // type: 'category',
 
         },
         series: [{
-          name: "销量",
+          name: "活跃度",
           type: "bar",
           barWidth: 20,
-          data: [5, 20, 36, 10, 10, 20, 100],
+          data: seriesData,
           itemStyle: {
             normal: {
+              shadowColor: 'rgba(0, 0, 0, 0.5)',
+              shadowBlur: 1,
+              shadowOffsetY: -1,
+              shadowOffsetX: 1,
               label: {
                 show: true, //开启显示
                 position: 'top', //在上方显示
@@ -151,49 +168,72 @@
                   color: 'black',
                   fontSize: 16
                 }
-              }
-            }
+              },
+            },
+
           }
         }, ],
       };
-
       personal.setOption(personal_option)
 
-      var club_option = {
+      let club_option = {
         title: {
-          text: "ECharts 入门示例",
+          text: "系统活跃度",
         },
         color: '#73b7ff',
-        tooltip: {},
         legend: {
-          data: ["销量"],
+          data: ["活跃度"],
         },
         xAxis: {
-          data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子", "Easy"],
+          axisLabel: {
+            interval: 0,
+            rotate: -25,
+          },
+          data: dailyxAxisData.reverse(),
         },
         yAxis: {
           // type: 'category',
 
         },
         series: [{
-          name: "销量",
+          name: "活跃度",
           type: "line",
           barWidth: 20,
-          data: [5, 20, 36, 10, 10, 20, 100],
+          smooth: true,
+          data: dailyseriesData.reverse(),
+          areaStyle: {
+            color: {
+              type: 'linear',
+              x: 0,
+              y: 0,
+              x2: 0,
+              y2: 1,
+              colorStops: [{
+                offset: 0,
+                color: 'rgba(175,231,254,1)' // 0% 处的颜色
+              }, {
+                offset: 1,
+                color: 'rgba(175,231,254,0)' // 100% 处的颜色
+              }],
+              globalCoord: false // 缺省为 false
+            }
+          },
           itemStyle: {
             normal: {
+
               label: {
                 show: true, //开启显示
-                position: 'top', //在上方显示
+                position: 'right', //在上方显示
                 textStyle: { //数值样式
                   color: 'black',
                   fontSize: 16
-                }
+                },
               }
-            }
+            },
           }
         }, ],
       };
+
       club.setOption(club_option)
     }
   }
